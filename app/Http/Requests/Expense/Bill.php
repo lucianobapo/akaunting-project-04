@@ -34,7 +34,6 @@ class Bill extends Request
         // Get company id
         $company_id = $this->request->get('company_id');
 
-        //return [];
         return [
             'bill_number' => 'required|string|unique:bills,NULL,' . $id . ',id,company_id,' . $company_id . ',deleted_at,NULL',
             'bill_status_code' => 'required|string',
@@ -50,7 +49,7 @@ class Bill extends Request
             'vendor_id' => 'required|integer',
             'vendor_name' => 'required|string',
             'category_id' => 'required|integer',
-            //'attachment' => 'mimes:' . setting('general.file_types') . '|between:0,' . setting('general.file_size') * 1024,
+            'attachment' => 'mimes:' . setting('general.file_types') . '|between:0,' . setting('general.file_size') * 1024,
         ];
     }
 

@@ -112,7 +112,7 @@ class Installer
 
         // Update .env file
         static::updateEnv([
-            'APP_KEY'   =>  'base64:'.base64_encode(random_bytes(16)),
+            'APP_KEY'   =>  'base64:'.base64_encode(random_bytes(32)),
         ]);
 	}
 
@@ -232,8 +232,6 @@ class Installer
             'password' => $password,
             'locale' => $locale,
         ]);
-
-        logger($user);
 
         // Attach admin role
         $user->roles()->attach('1');

@@ -2,12 +2,12 @@
 
 return [
 
-    'invoice_number'        => 'Número da Venda',
+    'invoice_number'        => 'Número da Fatura',
     'invoice_date'          => 'Data de Emissão',
     'total_price'           => 'Valor total',
     'due_date'              => 'Data de Vencimento',
     'order_number'          => 'Número',
-    'bill_to'               => 'Faturar para',
+    'bill_to'               => 'Pagar para',
 
     'quantity'              => 'Quantidade',
     'price'                 => 'Preço',
@@ -19,11 +19,10 @@ return [
     'item_name'             => 'Item|Itens',
 
     'show_discount'         => ':discount% desconto',
-    'show_discount2'         => ':discount desconto',
     'add_discount'          => 'Adicionar desconto',
     'discount_desc'         => 'subtotal',
 
-    'payment_due'           => 'Vencimento',
+    'payment_due'           => 'Pagamento vencido',
     'paid'                  => 'Pago',
     'histories'             => 'Histórico',
     'payments'              => 'Pagamentos',
@@ -40,7 +39,7 @@ return [
 
     'status' => [
         'draft'             => 'Rascunho',
-        'sent'              => 'Enviado',
+        'sent'              => 'Enviar',
         'viewed'            => 'Visto',
         'approved'          => 'Aprovado',
         'partial'           => 'Parcial',
@@ -66,9 +65,8 @@ return [
     ],
 
     'notification' => [
-        'message'           => 'Você está recebendo este e-mail porque foi registrado uma fatura no valor total de :amount, com vencimento em :due_at.',
-        'button'            => 'Ver Fatura',
-        'subject'              => 'Nova Fatura - :invoice_number',
+        'message'           => 'Você está recebendo este e-mail porque tem :amount fatura a vencer.',
+        'button'            => 'Pagar agora',
     ],
 
 ];

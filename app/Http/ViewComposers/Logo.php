@@ -3,7 +3,6 @@
 namespace App\Http\ViewComposers;
 
 use App\Models\Common\Media;
-use App\Utilities\CacheUtility;
 use Illuminate\View\View;
 use File;
 use Image;
@@ -20,7 +19,7 @@ class Logo
      */
     public function compose(View $view)
     {
-        $cache = new CacheUtility();
+        $logo = '';
 
         $media_id = setting('general.company_logo');
 
@@ -28,33 +27,27 @@ class Logo
             $media_id = setting('general.invoice_logo');
         }
 
-        $logo = $cache->remember('logo_view_composer_media_'.$media_id, function () use ($media_id) {
-            $logo = '';            
+        $media = Media::find($media_id);
 
-            $media = Media::find($media_id);
+        if (!empty($media)) {
+            $path = Storage::path($media->getDiskPath());
 
-            if (!empty($media)) {
-                $path = Storage::path($media->getDiskPath());
-
-                if (!is_file($path)) {
-                    return $logo;
-                }
-            } else {
-                $path = ('public/img/company.png');
-            }
-
-            $image = Image::make($path)->encode()->getEncoded();
-
-            if (empty($image)) {
+            if (!is_file($path)) {
                 return $logo;
             }
+        } else {
+            $path = asset('public/img/company.png');
+        }
 
-            $extension = File::extension($path);
+        $image = Image::make($path)->encode()->getEncoded();
 
-            $logo = 'data:image/' . $extension . ';base64,' . base64_encode($image);
-
+        if (empty($image)) {
             return $logo;
-        }, Media::class);
+        }
+
+        $extension = File::extension($path);
+
+        $logo = 'data:image/' . $extension . ';base64,' . base64_encode($image);
 
         $view->with(['logo' => $logo]);
     }

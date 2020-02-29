@@ -29,11 +29,9 @@ use App\Models\Setting\Tax;
 use App\Traits\Currencies;
 use App\Traits\DateTime;
 use App\Traits\Uploads;
-use App\Traits\Expenses;
 use App\Utilities\Import;
 use App\Utilities\ImportFile;
 use App\Utilities\Modules;
-use App\Utilities\CacheUtility;
 use Date;
 use File;
 use Image;
@@ -41,36 +39,25 @@ use Storage;
 
 class Bills extends Controller
 {
-    use DateTime, Currencies, Uploads, Expenses;
+    use DateTime, Currencies, Uploads;
 
     /**
      * Display a listing of the resource.
      *
      * @return Response
      */
-    public function index(CacheUtility $cache)
+    public function index()
     {
-        $bills = $cache->remember('bills_with_vendor_status_ordered', function () {
-            return Bill::with(['vendor', 'status', 'items', 'payments', 'histories'])->collect([
-                'billed_at'=> 'desc'
-                //'due_at'=> 'desc'
-            ]);
-        }, [Bill::class]);
+        $bills = Bill::with(['vendor', 'status', 'items', 'payments', 'histories'])->collect(['billed_at'=> 'desc']);
 
-        $vendors = $cache->remember('vendors_enabled', function () {
-            return collect(Vendor::enabled()->orderBy('name')->pluck('name', 'id'));
-        }, [Vendor::class]);
+        $vendors = collect(Vendor::enabled()->orderBy('name')->pluck('name', 'id'));
 
-        $categories = $cache->remember('categories_enabled', function () {
-            return collect(Category::enabled()->type('expense')->orderBy('name')->pluck('name', 'id'));
-        }, [Category::class]);
+        $categories = collect(Category::enabled()->type('expense')->orderBy('name')->pluck('name', 'id'));
 
-        $statuses = $cache->remember('bill_status', function () {
-            return collect(BillStatus::get()->each(function($item) {
+        $statuses = collect(BillStatus::get()->each(function($item) {
             $item->name = trans('bills.status.' . $item->code);
             return $item;
         })->pluck('name', 'code'));
-        }, [BillStatus::class]);
 
         return view('expenses.bills.index', compact('bills', 'vendors', 'categories', 'statuses'));
     }
@@ -117,10 +104,8 @@ class Bills extends Controller
         $taxes = Tax::enabled()->orderBy('name')->get()->pluck('title', 'id');
 
         $categories = Category::enabled()->type('expense')->orderBy('name')->pluck('name', 'id');
-        
-        $number = $this->getNextBillNumber();
 
-        return view('expenses.bills.create', compact('vendors', 'currencies', 'currency', 'items', 'taxes', 'categories', 'number'));
+        return view('expenses.bills.create', compact('vendors', 'currencies', 'currency', 'items', 'taxes', 'categories'));
     }
 
     /**
@@ -160,9 +145,6 @@ class Bills extends Controller
             'notify' => 0,
             'description' => trans('messages.success.added', ['type' => $clone->bill_number]),
         ]);
-
-        // Update next bill number
-        $this->increaseNextBillNumber();
 
         $message = trans('messages.success.duplicated', ['type' => trans_choice('general.bills', 1)]);
 

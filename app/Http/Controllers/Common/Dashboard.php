@@ -15,7 +15,6 @@ use App\Traits\Currencies;
 use App\Traits\DateTime;
 use Charts;
 use Date;
-use App\Utilities\CacheUtility;
 
 class Dashboard extends Controller
 {
@@ -29,12 +28,6 @@ class Dashboard extends Controller
     public $income_donut = ['colors' => [], 'labels' => [], 'values' => []];
 
     public $expense_donut = ['colors' => [], 'labels' => [], 'values' => []];
-
-    public function __construct(CacheUtility $cache)
-    {
-        parent::__construct();
-         $this->cache = $cache;
-    }
 
     /**
      * Display a listing of the resource.
@@ -52,7 +45,7 @@ class Dashboard extends Controller
 
         list($donut_incomes, $donut_expenses) = $this->getDonuts();
 
-        $accounts = Account::enabled()->take(10)->get();
+        $accounts = Account::enabled()->take(6)->get();
 
         $latest_incomes = $this->getLatestIncomes();
 
@@ -244,15 +237,11 @@ class Dashboard extends Controller
 
     private function getLatestIncomes()
     {
-        $invoices = $this->cache->remember('invoices_with_category_accrued', function () {
-            return collect(Invoice::with('category')->orderBy('invoiced_at', 'desc')->accrued()->take(10)->get())->each(function ($item) {
-                $item->paid_at = $item->invoiced_at;
-            });
-        }, [Invoice::class]);
+        $invoices = collect(Invoice::orderBy('invoiced_at', 'desc')->accrued()->take(10)->get())->each(function ($item) {
+            $item->paid_at = $item->invoiced_at;
+        });
 
-        $revenues = $this->cache->remember('revenues_isNotTransfer', function () {
-            return collect(Revenue::orderBy('paid_at', 'desc')->isNotTransfer()->take(10)->get());
-        }, [Revenue::class]);
+        $revenues = collect(Revenue::orderBy('paid_at', 'desc')->isNotTransfer()->take(10)->get());
 
         $latest = $revenues->merge($invoices)->take(5)->sortByDesc('paid_at');
 
@@ -261,15 +250,11 @@ class Dashboard extends Controller
 
     private function getLatestExpenses()
     {
-        $bills = $this->cache->remember('bills_with_category_accrued', function () {
-            return collect(Bill::with('category')->orderBy('billed_at', 'desc')->accrued()->take(10)->get())->each(function ($item) {
-                $item->paid_at = $item->billed_at;
-            });
-        }, [Bill::class]);
+        $bills = collect(Bill::orderBy('billed_at', 'desc')->accrued()->take(10)->get())->each(function ($item) {
+            $item->paid_at = $item->billed_at;
+        });
 
-        $payments = $this->cache->remember('payments_isNotTransfer', function () {
-            return collect(Payment::orderBy('paid_at', 'desc')->isNotTransfer()->take(10)->get());
-        }, [Payment::class]);
+        $payments = collect(Payment::orderBy('paid_at', 'desc')->isNotTransfer()->take(10)->get());
 
         $latest = $payments->merge($bills)->take(5)->sortByDesc('paid_at');
 
@@ -282,9 +267,7 @@ class Dashboard extends Controller
         $expenses_amount = $open_bill = $overdue_bill = 0;
 
         // Get categories
-        $categories = $this->cache->remember('category_with_bills_invoices_payments_revenues', function () {
-            return Category::with(['bills', 'invoices', 'payments', 'revenues'])->orWhere('type', 'income')->orWhere('type', 'expense')->enabled()->get();
-        }, [Category::class, Bill::class, Invoice::class, Payment::class, Revenue::class]);
+        $categories = Category::with(['bills', 'invoices', 'payments', 'revenues'])->orWhere('type', 'income')->orWhere('type', 'expense')->enabled()->get();
 
         foreach ($categories as $category) {
             switch ($category->type) {
@@ -299,10 +282,7 @@ class Dashboard extends Controller
                     $incomes_amount += $amount;
 
                     // Invoices
-                    $invoices = $this->cache->remember('invoices_of_category_id_'.$category->id, function () use ($category) {
-                        return $category->invoices()->accrued()->get();
-                    }, [Category::class, Invoice::class]);
-
+                    $invoices = $category->invoices()->accrued()->get();
                     foreach ($invoices as $invoice) {
                         list($paid, $open, $overdue) = $this->calculateInvoiceBillTotals($invoice, 'invoice');
 
@@ -327,11 +307,7 @@ class Dashboard extends Controller
                     $expenses_amount += $amount;
 
                     // Bills
-                    $bills = $this->cache->remember('bills_of_category_id_'.$category->id, function () use ($category) {
-                        return $category->bills()->accrued()->get();
-                    }, [Category::class, Bill::class]);
-
-
+                    $bills = $category->bills()->accrued()->get();
                     foreach ($bills as $bill) {
                         list($paid, $open, $overdue) = $this->calculateInvoiceBillTotals($bill, 'bill');
 
@@ -394,15 +370,11 @@ class Dashboard extends Controller
             }
         }
 
-        $items_1 = $this->cache->remember('calculateCashFlowTotals-'.$m1, function () use ($m1,$start, $end) {
-            return $m1::whereBetween('paid_at', [$start, $end])->isNotTransfer()->get();
-        }, [$m1]);
+        $items_1 = $m1::whereBetween('paid_at', [$start, $end])->isNotTransfer()->get();
 
         $this->setCashFlowTotals($totals, $items_1, $date_format, $period);
 
-        $items_2 = $this->cache->remember('calculateCashFlowTotals-'.$m2, function () use ($m2,$start, $end){
-            return $m2::whereBetween('paid_at', [$start, $end])->get();
-        }, [$m2]);
+        $items_2 = $m2::whereBetween('paid_at', [$start, $end])->get();
 
         $this->setCashFlowTotals($totals, $items_2, $date_format, $period);
 

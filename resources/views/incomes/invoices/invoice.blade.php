@@ -3,17 +3,6 @@
 @section('title', trans_choice('general.invoices', 1) . ': ' . $invoice->invoice_number)
 
 @section('content')
-
-@if ($invoice->invoice_status_code=='draft')
-    <div id="watermark">
-        <p>
-            @for($i=0;$i<120;$i++)
-                {{ $invoice->invoice_status_code }}
-            @endfor
-        </p>
-    </div>
-@endif
-
 <div class="row header">
     <div class="col-58">
         @if ($logo)
@@ -154,7 +143,7 @@
         @if ($invoice->notes)
         <table class="text" style="page-break-inside: avoid;">
             <tr><th>{{ trans_choice('general.notes', 2) }}</th></tr>
-            <tr><td>{!! nl2br(e($invoice->notes)) !!}</td></tr>
+            <tr><td>{{ $invoice->notes }}</td></tr>
         </table>
         @endif
         @stack('notes_input_end')

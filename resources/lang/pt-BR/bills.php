@@ -2,12 +2,12 @@
 
 return [
 
-    'bill_number'           => 'Número da Compra',
+    'bill_number'           => 'Número da conta',
     'bill_date'             => 'Data de Emissão',
     'total_price'           => 'Valor Total',
     'due_date'              => 'Data de Vencimento',
     'order_number'          => 'Número',
-    'bill_from'             => 'Fatura de',
+    'bill_from'             => 'Bill From',
 
     'quantity'              => 'Quantidade',
     'price'                 => 'Preço',

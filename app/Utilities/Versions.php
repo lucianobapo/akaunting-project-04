@@ -15,15 +15,11 @@ class Versions
     public static function changelog()
     {
         $output = '';
-        
-        if (config('app.env')=='local') return $output;
 
         $url = 'https://api.github.com/repos/akaunting/akaunting/releases';
 
         $http = new \GuzzleHttp\Client(['verify' => false]);
 
-        dbg('Versions.php: GuzzleHttp\Client ->get() called - '.$url);
-        
         $json = $http->get($url, ['timeout' => 30])->getBody()->getContents();
 
         if (empty($json)) {
@@ -74,8 +70,21 @@ class Versions
         // Check core first
         $url = 'core/version/' . $info['akaunting'] . '/' . $info['php'] . '/' . $info['mysql'] . '/' . $info['companies'];
 
+        $installed_modules = [];
+        $module_version = '?modules=';
+
+        foreach ($modules as $module) {
+            $alias = $module->get('alias');
+            $version = $module->get('version');
+
+            $installed_modules[] = $alias;
+        }
+
+        $module_version .= implode(',', $installed_modules);
+
+        $url .= $module_version;
+
         $data['core'] = static::getLatestVersion($url);
-        if ($data['core']=='0.0.0') $data['core'] = $info['akaunting'];
 
         // Then modules
         foreach ($modules as $module) {
@@ -85,7 +94,6 @@ class Versions
             $url = 'apps/' . $alias . '/version/' . $version . '/' . $info['akaunting'];
 
             $data[$alias] = static::getLatestVersion($url);
-            if ($data[$alias]=='0.0.0') $data[$alias] = $version;
         }
 
         Cache::put('versions', $data, Date::now()->addHour(6));
@@ -116,9 +124,6 @@ class Versions
             return $latest;
         }
 
-        // Get the latest version
-        $latest = $content->data->latest;
-
-        return $latest;
+        return $content;
     }
 }

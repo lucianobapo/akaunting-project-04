@@ -17,7 +17,7 @@ $options = !empty($options) ? $options : false;
         @endif
 
         <div class="mailbox-attachment-info">
-            <a target=_blank href="{{ url('uploads/' . $file->id) }}" class="mailbox-attachment-name">
+            <a href="javascript:void();" class="mailbox-attachment-name">
                 <p class="mailbox-attachment-file-name">
                     <i class="fa fa-paperclip"></i> {{ $file->basename }}
                 </p>
@@ -33,7 +33,7 @@ $options = !empty($options) ? $options : false;
                 'url' => [url('uploads/' . $file->id)],
                 'style' => 'display:inline'
             ]) !!}
-                <a href="javascript:void();" id="remove-attachment-{{ $file->id }}" class="btn btn-danger btn-xs pull-right mailbox-attachment-remove">
+                <a href="javascript:void();" id="remove-attachment" class="btn btn-danger btn-xs pull-right mailbox-attachment-remove">
                     <i class="fa fa fa-times"></i>
                 </a>
 

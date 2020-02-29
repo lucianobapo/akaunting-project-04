@@ -28,7 +28,7 @@
 
         {{ Form::textGroup('due_at', trans('bills.due_date'), 'calendar',['id' => 'due_at', 'class' => 'form-control', 'required' => 'required', 'data-inputmask' => '\'alias\': \'yyyy/mm/dd\'', 'data-mask' => '', 'autocomplete' => 'off'],Date::now()->toDateString()) }}
 
-        {{ Form::textGroup('bill_number', trans('bills.bill_number'), 'file-text-o', ['required' => 'required'], $number) }}    
+        {{ Form::textGroup('bill_number', trans('bills.bill_number'), 'file-text-o') }}
 
         {{ Form::textGroup('order_number', trans('bills.order_number'), 'shopping-cart',[]) }}
 

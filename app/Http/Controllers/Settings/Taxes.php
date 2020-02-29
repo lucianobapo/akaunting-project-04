@@ -20,7 +20,6 @@ class Taxes extends Controller
 
         $types = [
             'normal' => trans('taxes.normal'),
-            'dentro' => trans('taxes.dentro'),
             'inclusive' => trans('taxes.inclusive'),
             'compound' => trans('taxes.compound'),
         ];
@@ -47,7 +46,6 @@ class Taxes extends Controller
     {
         $types = [
             'normal' => trans('taxes.normal'),
-            'dentro' => trans('taxes.dentro'),
             'inclusive' => trans('taxes.inclusive'),
             'compound' => trans('taxes.compound'),
         ];
@@ -84,7 +82,6 @@ class Taxes extends Controller
     {
         $types = [
             'normal' => trans('taxes.normal'),
-            'dentro' => trans('taxes.dentro'),
             'inclusive' => trans('taxes.inclusive'),
             'compound' => trans('taxes.compound'),
         ];

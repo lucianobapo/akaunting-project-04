@@ -19,6 +19,7 @@ class UpdateFinished
      */
     public function __construct($alias, $old, $new)
     {
+        \Log::info('Firing update in event 1.3.18');
         $this->alias = $alias;
         $this->old = $old;
         $this->new = $new;

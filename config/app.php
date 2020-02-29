@@ -64,7 +64,7 @@ return [
     |
     */
 
-    'timezone' => 'America/Sao_Paulo',
+    'timezone' => 'UTC',
 
     /*
     |--------------------------------------------------------------------------
@@ -120,7 +120,7 @@ return [
     |
     */
 
-    'log' => env('APP_LOG', 'daily'),
+    'log' => env('APP_LOG', 'single'),
 
     'log_level' => env('APP_LOG_LEVEL', 'debug'),
 
@@ -206,13 +206,7 @@ return [
         Nwidart\Modules\LaravelModulesServiceProvider::class,
         Sofa\Eloquence\ServiceProvider::class,
         Plank\Mediable\MediableServiceProvider::class,
-        
-        LynX39\LaraPdfMerger\PdfMergerServiceProvider::class,
-        
-        ErpNET\Permissions\Providers\ErpnetPermissionsServiceProvider::class,
-                
-        ErpNET\Profiting\Milk\Providers\ErpnetProfitingMilkServiceProvider::class,
-        ErpNET\Profiting\Calendar\Providers\ErpnetProfitingCalendarServiceProvider::class,
+
     ],
 
     /*
@@ -282,9 +276,7 @@ return [
         'Setting' => Akaunting\Setting\Facade::class,
         'SignedUrl' => Akaunting\SignedUrl\Facade::class,
         'Version' => Akaunting\Version\Facade::class,
-        
-        'PdfMerger' => LynX39\LaraPdfMerger\Facades\PdfMerger::class,
-        
+
     ],
 
 ];

@@ -56,7 +56,7 @@ class InvoiceTotal extends Model
         switch ($this->code) {
             case 'discount':
                 $title = trans($title);
-                //$percent = $this->invoice->discount;
+                $percent = $this->invoice->discount;
 
                 break;
             case 'tax':

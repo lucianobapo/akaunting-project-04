@@ -6,21 +6,19 @@ use App\Models\Common\Company as Model;
 use Artisan;
 use Auth;
 
-class Company extends TObserver
+class Company
 {
-    public $modelClass = Model::class; 
-
     /**
      * Listen to the created event.
      *
      * @param  Model  $company
      * @return void
      */
-    public function created($model)
+    public function created(Model $company)
     {
         // Create seeds
         Artisan::call('company:seed', [
-            'company' => $model->id
+            'company' => $company->id
         ]);
 
         // Check if user is logged in
@@ -29,9 +27,7 @@ class Company extends TObserver
         }
 
         // Attach company to user
-        Auth::user()->companies()->attach($model->id);
-
-        parent::created($model);
+        Auth::user()->companies()->attach($company->id);
     }
 
     /**
@@ -40,7 +36,7 @@ class Company extends TObserver
      * @param  Model  $company
      * @return void
      */
-    public function deleted($model)
+    public function deleted(Model $company)
     {
         $tables = [
             'accounts', 'bill_histories', 'bill_items', 'bill_payments', 'bill_statuses', 'bills', 'categories',
@@ -49,11 +45,21 @@ class Company extends TObserver
         ];
 
         foreach ($tables as $table) {
-            foreach ($model->$table as $item) {
-                $item->delete();
-            }
+            $this->deleteItems($company, $table);
         }
+    }
 
-        parent::deleted($model);
+    /**
+     * Delete items in batch.
+     *
+     * @param  Model  $company
+     * @param  $table
+     * @return void
+     */
+    protected function deleteItems($company, $table)
+    {
+        foreach ($company->$table as $item) {
+            $item->delete();
+        }
     }
 }

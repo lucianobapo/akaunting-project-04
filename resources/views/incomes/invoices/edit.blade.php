@@ -19,113 +19,92 @@
             {{ Form::textGroup('invoice_number', trans('invoices.invoice_number'), 'file-text-o') }}
 
             {{ Form::textGroup('order_number', trans('invoices.order_number'), 'shopping-cart',[]) }}
-            
-           
-            @php $item_row = 0; $tax_row = 0; @endphp
 
-            <div id="items" class="form-group col-md-12" style="background-color: #f9f9f9;">
-
+            <div class="form-group col-md-12">
                 {!! Form::label('items', trans_choice($text_override['items'], 2), ['class' => 'control-label']) !!}
-
-                <div class="hidden-sm hidden-xs">
-                    @stack('actions_th_start')
-                        <div class="form-group col-md-1">
-                            {{ trans('general.actions') }}
-                        </div>
-                    @stack('actions_th_end')
-
-                    @stack('name_th_start')
-                        <div class="form-group col-md-4">
-                            {{ trans('general.name') }}
-                        </div>
-                    @stack('name_th_end')
-
-                    @stack('quantity_th_start')
-                        <div class="form-group col-md-1">
-                            {{ trans($text_override['quantity']) }}
-                        </div>
-                    @stack('quantity_th_end')
-
-                    @stack('price_th_start')
-                        <div class="form-group col-md-2">
-                            {{ trans($text_override['price']) }}
-                        </div>
-                    @stack('price_th_end')
-
-                    @stack('taxes_th_start')
-                        <div class="form-group col-md-3">
-                            {{ trans_choice('general.taxes', 1) }}
-                        </div>
-                    @stack('taxes_th_end')
-
-                    @stack('total_th_start')
-                        <div class="form-group col-md-1">
-                            {{ trans('invoices.total') }}
-                        </div>
-                    @stack('total_th_end')
-                </div>
-                <div class="form-group col-md-12">
-                    
-                    @if(old('item'))
-                        @foreach(old('item') as $old_item)
-                            @php $item = (object) $old_item; @endphp
-                            @include('incomes.invoices.item2')
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="items">
+                        <thead>
+                            <tr style="background-color: #f9f9f9;">
+                                @stack('actions_th_start')
+                                <th width="5%"  class="text-center">{{ trans('general.actions') }}</th>
+                                @stack('actions_th_end')
+                                @stack('name_th_start')
+                                <th width="40%" class="text-left">{{ trans('general.name') }}</th>
+                                @stack('name_th_end')
+                                @stack('quantity_th_start')
+                                <th width="5%" class="text-center">{{ trans($text_override['quantity']) }}</th>
+                                @stack('quantity_th_end')
+                                @stack('price_th_start')
+                                <th width="10%" class="text-right">{{ trans($text_override['price']) }}</th>
+                                @stack('price_th_end')
+                                @stack('taxes_th_start')
+                                <th width="15%" class="text-right">{{ trans_choice('general.taxes', 1) }}</th>
+                                @stack('taxes_th_end')
+                                @stack('total_th_start')
+                                <th width="10%" class="text-right">{{ trans('invoices.total') }}</th>
+                                @stack('total_th_end')
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @php $item_row = 0; $tax_row = 0; @endphp
+                            @if(old('item'))
+                                @foreach(old('item') as $old_item)
+                                    @php $item = (object) $old_item; @endphp
+                                    @include('incomes.invoices.item')
+                                    @php $item_row++; @endphp
+                                @endforeach
+                            @else
+                                @foreach($invoice->items as $item)
+                                    @include('incomes.invoices.item')
+                                    @php $item_row++; @endphp
+                                @endforeach
+                                @if (empty($invoice->items))
+                                    @include('incomes.invoices.item')
+                                @endif
+                            @endif
                             @php $item_row++; @endphp
-                        @endforeach
-                    @else            
-                        @if (empty($invoice->items))
-                            @include('incomes.invoices.item2')
-                            @php $item_row++; @endphp
-                        @else
-                            @foreach($invoice->items as $item)
-                                @include('incomes.invoices.item2')
-                                @php $item_row++; @endphp
-                            @endforeach
-                        @endif
-                    @endif        
-
-                    @stack('add_item_td_start')
-                        <div id="addItem" class="form-group col-md-12">
-                            <button type="button" id="button-add-item" data-toggle="tooltip" title="{{ trans('general.add') }}" class="btn btn-xs btn-primary" data-original-title="{{ trans('general.add') }}">
-                                <i class="fa fa-plus"></i>
-                            </button>
-                        </div>
-                    @stack('add_item_td_end')
-
-                    @stack('sub_total_td_start')
-                        <div id="tr-subtotal" class="form-group col-md-12">
-                            <strong>{{ trans('invoices.sub_total') }}</strong>
-                            <span id="sub-total">@money(0,setting('general.default_currency'),true)</span>
-                        </div>
-                    @stack('sub_total_td_end')
-
-                    @stack('add_discount_td_start')
-                        <div id="tr-discount" class="form-group col-md-12">
-                            <a href="javascript:void(0)" id="discount-text" rel="popover">{{ trans('invoices.add_discount') }}</a>
-                            <span id="discount-total"></span>
-                            {!! Form::hidden('discount', null, ['id' => 'discount', 'class' => '']) !!}
-                            {!! Form::hidden('discount2', null, ['id' => 'discount2', 'class' => '']) !!}
-                        </div>
-                    @stack('add_discount_td_end')
-
-                    @stack('tax_total_td_start')
-                        <div id="tr-tax" class="form-group col-md-12">
-                            <strong>{{ trans_choice('general.taxes', 1) }}</strong>
-                            <span id="tax-total">@money(0,setting('general.default_currency'),true)</span>
-                        </div>
-                    @stack('tax_total_td_end')
-
-                    @stack('grand_total_td_start')
-                        <div id="tr-total" class="form-group col-md-12">
-                            <strong>{{ trans('invoices.total') }}</strong>
-                            <span id="grand-total">@money(0,setting('general.default_currency'),true)</span>
-                        </div>
-                    @stack('grand_total_td_end')
+                            @stack('add_item_td_start')
+                            <tr id="addItem">
+                                <td class="text-center"><button type="button" id="button-add-item" data-toggle="tooltip" title="{{ trans('general.add') }}" class="btn btn-xs btn-primary" data-original-title="{{ trans('general.add') }}"><i class="fa fa-plus"></i></button></td>
+                                <td class="text-right" colspan="5"></td>
+                            </tr>
+                            @stack('add_item_td_end')
+                            @stack('sub_total_td_start')
+                            <tr id="tr-subtotal">
+                                <td class="text-right" colspan="5"><strong>{{ trans('invoices.sub_total') }}</strong></td>
+                                <td class="text-right"><span id="sub-total">0</span></td>
+                            </tr>
+                            @stack('sub_total_td_end')
+                            @stack('add_discount_td_start')
+                            <tr id="tr-discount">
+                                <td class="text-right" style="vertical-align: middle;" colspan="5">
+                                    <a href="javascript:void(0)" id="discount-text" rel="popover">{{ trans('invoices.add_discount') }}</a>
+                                </td>
+                                <td class="text-right">
+                                    <span id="discount-total"></span>
+                                    {!! Form::hidden('discount', null, ['id' => 'discount', 'class' => 'form-control text-right']) !!}
+                                </td>
+                            </tr>
+                            @stack('add_discount_td_end')
+                            @stack('tax_total_td_start')
+                            <tr id="tr-tax">
+                                <td class="text-right" colspan="5">
+                                    <strong>{{ trans_choice('general.taxes', 1) }}</strong>
+                                </td>
+                                <td class="text-right"><span id="tax-total">0</span></td>
+                            </tr>
+                            @stack('tax_total_td_end')
+                            @stack('grand_total_td_start')
+                            <tr id="tr-total">
+                                <td class="text-right" colspan="5"><strong>{{ trans('invoices.total') }}</strong></td>
+                                <td class="text-right"><span id="grand-total">0</span></td>
+                            </tr>
+                            @stack('grand_total_td_end')
+                        </tbody>
+                    </table>
                 </div>
-                                
             </div>
-
-
 
             {{ Form::textareaGroup('notes', trans_choice('general.notes', 2)) }}
 
@@ -171,7 +150,6 @@
 @endpush
 
 @push('scripts')
-
     <script type="text/javascript">
         var focus = false;
         var item_row = '{{ $item_row }}';
@@ -262,14 +240,6 @@
                     html += '        </div>';
                     html += '    </div>';
                     html += '</div>';
-                    html += '<div class="discount box-body">';
-                    html += '    <div class="col-md-6">';
-                    html += '        <div class="input-group" id="input-discount2">';
-                    html += '            {!! Form::number('pre-discount2', null, ['id' => 'pre-discount2', 'class' => 'form-control text-right']) !!}';
-                    html += '            <div class="input-group-addon"><i class="fa fa-usd"></i></div>';
-                    html += '        </div>';
-                    html += '    </div>';
-                    html += '</div>';
                     html += '<div class="discount box-footer">';
                     html += '    <div class="col-md-12">';
                     html += '        <div class="form-group no-margin">';
@@ -328,7 +298,7 @@
                 data: {item_row: item_row, currency_code : $('#currency_code').val()},
                 success: function(json) {
                     if (json['success']) {
-                        $('#addItem').before(json['html']);
+                        $('#items tbody #addItem').before(json['html']);
                         //$('[rel=tooltip]').tooltip();
 
                         $('[data-toggle="tooltip"]').tooltip('hide');
@@ -428,14 +398,7 @@
         $(document).on('keyup', '#pre-discount', function(e){
             e.preventDefault();
 
-            $('#discount').val(parseFloat($(this).val()));
-
-            totalItem();
-        });
-        $(document).on('keyup', '#pre-discount2', function(e){
-            e.preventDefault();
-
-            $('#discount2').val(parseFloat($(this).val()));
+            $('#discount').val($(this).val());
 
             totalItem();
         });
@@ -540,7 +503,7 @@
                 url: '{{ url("common/items/totalItem") }}',
                 type: 'POST',
                 dataType: 'JSON',
-                data: $('#currency_code, #discount2 input[type=\'number\'], #discount input[type=\'number\'], #items input[type=\'text\'], #items input[type=\'number\'], #items input[type=\'hidden\'], #items textarea, #items select').serialize(),
+                data: $('#currency_code, #discount input[type=\'number\'], #items input[type=\'text\'], #items input[type=\'number\'], #items input[type=\'hidden\'], #items textarea, #items select').serialize(),
                 headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
                 success: function(data) {
                     if (data) {

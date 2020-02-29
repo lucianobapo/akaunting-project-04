@@ -7,8 +7,6 @@ use App\Traits\Currencies;
 use Bkwld\Cloner\Cloneable;
 use Sofa\Eloquence\Eloquence;
 use App\Traits\Media;
-use App\Utilities\CacheUtility;
-use App\Models\Common\Media as ModelMedia;
 
 class Item extends Model
 {
@@ -35,7 +33,7 @@ class Item extends Model
      *
      * @var array
      */
-    protected $sortable = ['sku', 'name', 'category', 'quantity', 'sale_price', 'purchase_price', 'enabled'];
+    protected $sortable = ['name', 'category', 'quantity', 'sale_price', 'purchase_price', 'enabled'];
 
     /**
      * Searchable rules.
@@ -149,21 +147,12 @@ class Item extends Model
      */
     public function getPictureAttribute($value)
     {
-        $cache = new CacheUtility();
-
-        $media = $cache->remember('itemHasMedia'.$this->id, function () {
-            if ($this->hasMedia('picture'))
-                return $this->getMedia('picture')->last();
-            else
-                return false;
-        }, [ModelMedia::class, self::class]);
-
-        if (!empty($value) && ($media==false)) {
+        if (!empty($value) && !$this->hasMedia('picture')) {
             return $value;
-        } elseif ($media==false) {
+        } elseif (!$this->hasMedia('picture')) {
             return false;
         }
 
-        return $media;
+        return $this->getMedia('picture')->last();
     }
 }

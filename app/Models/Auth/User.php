@@ -14,12 +14,10 @@ use Kyslik\ColumnSortable\Sortable;
 use App\Traits\Media;
 use Request;
 use Route;
-use GeneaLabs\LaravelModelCaching\Traits\Cachable;
 
 class User extends Authenticatable
 {
     use Filterable, LaratrustUserTrait, Notifiable, SoftDeletes, Sortable, Media;
-    //use Cachable;
 
     protected $table = 'users';
 

@@ -12,7 +12,6 @@ use App\Models\Setting\Tax;
 use App\Traits\Uploads;
 use App\Utilities\Import;
 use App\Utilities\ImportFile;
-use App\Utilities\CacheUtility;
 
 class Items extends Controller
 {
@@ -23,15 +22,11 @@ class Items extends Controller
      *
      * @return Response
      */
-    public function index(CacheUtility $cache)
+    public function index()
     {
-        $items = $cache->remember('items_with_category', function () {
-            return Item::with('category')->sortable(['sku' => 'desc'])->collect();
-        }, [Item::class]);
+        $items = Item::with('category')->collect();
 
-        $categories = $cache->remember('categories_pluck', function () {
-            return Category::enabled()->orderBy('name')->type('item')->pluck('name', 'id');
-        }, [Category::class]);
+        $categories = Category::enabled()->orderBy('name')->type('item')->pluck('name', 'id');
 
         return view('common.items.index', compact('items', 'categories'));
     }
@@ -270,7 +265,7 @@ class Items extends Controller
         ]);
 
         if ($type == 'invoice') {
-            //$autocomplete->quantity();
+            $autocomplete->quantity();
         }
 
         $items = $autocomplete->get();
@@ -310,7 +305,6 @@ class Items extends Controller
         $input_items = $request->input('item');
         $currency_code = $request->input('currency_code');
         $discount = $request->input('discount');
-        $discount2 = $request->input('discount2');
 
         if (empty($currency_code)) {
             $currency_code = setting('general.default_currency');
@@ -335,25 +329,17 @@ class Items extends Controller
                 $item_discount_total = $item_sub_total;
 
                 // Apply discount to item
-                if ($discount && is_numeric($discount)) {
+                if ($discount) {
                     $item_discount_total = $item_sub_total - ($item_sub_total * ($discount / 100));
-                } 
-
-                if ($discount2 && is_numeric($discount2)) {
-                    $item_discount_total = $item_sub_total - $discount2 ;
-                } 
-                
+                }
 
                 if (!empty($item['tax_id'])) {
-                    $dentro = $inclusives = $compounds = $taxes = [];
+                    $inclusives = $compounds = $taxes = [];
 
                     foreach ($item['tax_id'] as $tax_id) {
                         $tax = Tax::find($tax_id);
 
                         switch ($tax->type) {
-                            case 'dentro':
-                                $dentro[] = $tax;
-                                break;
                             case 'inclusive':
                                 $inclusives[] = $tax;
                                 break;
@@ -380,34 +366,6 @@ class Items extends Controller
                         $item_sub_total = $item_base_rate + $discount;
                     }
 
-                    if ($dentro) {
-                        $item_sub_and_tax_total = $item_discount_total + $item_tax_total;
-                        logger('$item_sub_and_tax_total');
-                        logger($item_sub_and_tax_total);
-
-                        $item_sum_rates = collect($dentro)->sum('rate')/100;
-                        logger('$item_sum_rates');
-                        logger($item_sum_rates);
-
-                        $item_rate = (1 - $item_sum_rates);
-                        logger('$item_rate');
-                        logger($item_rate);
-
-                        $item_base_rate = $item_sub_and_tax_total / $item_rate;
-                        logger('$item_base_rate');
-                        logger($item_base_rate);
-
-                        $item_tax_total = $item_base_rate - $item_sub_and_tax_total;
-                        logger('$item_tax_total');
-                        logger($item_tax_total);
-
-                        $item_sub_total = $item_sub_and_tax_total;
-                        //$item_sub_total = $item_base_rate + $discount;
-                        //$item_sub_total = $item_sub_and_tax_total - $item_tax_total;
-                        logger('$item_sub_total');
-                        logger($item_sub_total);
-                    }
-
                     if ($compounds) {
                         foreach ($compounds as $compound) {
                             $item_tax_total += (($item_discount_total + $item_tax_total) / 100) * $compound->rate;
@@ -432,20 +390,12 @@ class Items extends Controller
         $json->tax_total = money($tax_total, $currency_code, true)->format();
 
         // Apply discount to total
-        if ($discount && is_numeric($discount)) {
+        if ($discount) {
             $json->discount_text= trans('invoices.show_discount', ['discount' => $discount]);
             $json->discount_total = money($sub_total * ($discount / 100), $currency_code, true)->format();
 
             $sub_total = $sub_total - ($sub_total * ($discount / 100));
         }
-
-
-        if ($discount2 && is_numeric($discount2)) {
-            $json->discount_text= trans('invoices.show_discount2', ['discount' => money((double) $discount2, $currency_code, true)->format()]);
-            $json->discount_total = money((double) $discount2, $currency_code, true)->format();
-
-            $sub_total = $sub_total - $discount2;
-        } 
 
         $grand_total = $sub_total + $tax_total;
 

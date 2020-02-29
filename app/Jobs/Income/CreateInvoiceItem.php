@@ -19,7 +19,6 @@ class CreateInvoiceItem
     protected $invoice;
 
     protected $discount;
-    protected $discount2;
 
     /**
      * Create a new job instance.
@@ -28,12 +27,11 @@ class CreateInvoiceItem
      * @param  $invoice
      * @param  $discount
      */
-    public function __construct($data, $invoice, $discount = null, $discount2 = null)
+    public function __construct($data, $invoice, $discount = null)
     {
         $this->data = $data;
         $this->invoice = $invoice;
         $this->discount = $discount;
-        $this->discount2 = $discount2;
     }
 
     /**
@@ -53,9 +51,6 @@ class CreateInvoiceItem
         // Apply discount to tax
         if ($this->discount) {
             $item_discount_amount = $item_amount - ($item_amount * ($this->discount / 100));
-        }
-        if ($this->discount2) {
-            $item_discount_amount = $item_amount - $this->discount2;
         }
 
         if (!empty($item_id)) {
@@ -78,15 +73,7 @@ class CreateInvoiceItem
                                 continue;
                             }
 
-                            try{
-                                $user->notify(new ItemReminderNotification($item_object));
-                            }
-                            catch(\Exception $e){ // Using a generic exception
-                                logger('Mail not sent');
-                                logger($e);
-                            }
-
-                            
+                            $user->notify(new ItemReminderNotification($item_object));
                         }
                     }
                 }
@@ -98,14 +85,8 @@ class CreateInvoiceItem
                     if (!$user->can('read-notifications')) {
                         continue;
                     }
-                    
-                    try{
-                        $user->notify(new ItemNotification($item_object));
-                    }
-                    catch(\Exception $e){ // Using a generic exception
-                        logger('Mail not sent');
-                        logger($e); 
-                    }
+
+                    $user->notify(new ItemNotification($item_object));
                 }
             }
         } elseif (!empty($this->data['sku'])) {

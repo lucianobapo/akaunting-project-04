@@ -52,8 +52,6 @@ class RecurringCheck extends Command
 
         // Get all companies
         $companies = Company::all();
-        
-        debug('Start Recurring Command...');
 
         foreach ($companies as $company) {
             // Set company id
@@ -63,33 +61,23 @@ class RecurringCheck extends Command
             Overrider::load('settings');
             Overrider::load('currencies');
 
-            $company->setSettings();            
+            $company->setSettings();
 
-            foreach ($company->recurring as $recurring) {                
-
+            foreach ($company->recurring as $recurring) {
                 foreach ($recurring->schedule() as $recur) {
-
                     $recur_date = Date::parse($recur->getStart()->format('Y-m-d'));
 
-                    $today = Date::parse($this->today->format('Y-m-d'));
-
-                    // Check if should recur today - ne() is not equals
-                    if ($today->ne($recur_date)) {
-                        debug('Error - Recurring start date is not now');
-                        debug('- Today: '. $today);
-                        debug('- Recurring date: '. $recur_date);
+                    // Check if should recur today
+                    if ($this->today->ne($recur_date)) {
                         continue;
                     }
 
                     $model = $recurring->recurable;
 
                     if (!$model) {
-                        debug('Error - Recurring has empty model');
                         continue;
                     }
-                    
-                    debug('Running recurring: '. $recurring->recurable_type);
-                    
+
                     switch ($recurring->recurable_type) {
                         case 'App\Models\Expense\Bill':
                             $this->recurBill($company, $model);

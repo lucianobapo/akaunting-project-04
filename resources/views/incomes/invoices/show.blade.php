@@ -73,7 +73,7 @@
                         @stack('timeline_body_send_invoice_head_end')
 
                         @stack('timeline_body_send_invoice_body_start')
-                        <div class="timeline-body">                            
+                        <div class="timeline-body">
                             @if ($invoice->status->code != 'sent' && $invoice->status->code != 'partial')
                                 @stack('timeline_body_send_invoice_body_message_start')
                                 {{ trans_choice('general.statuses', 1) . ': ' . trans('invoices.messages.status.send.draft') }}
@@ -100,8 +100,7 @@
                                 @stack('timeline_body_send_invoice_body_button_email_end')
                             @else
                                 @stack('timeline_body_send_invoice_body_message_start')
-                                {{ trans_choice('general.statuses', 1) . ': ' . trans('invoices.messages.status.send.sent', ['date' => 
-                                $invoice_history ? Date::parse($invoice_history->created_at)->format($date_format):'']) }}
+                                {{ trans_choice('general.statuses', 1) . ': ' . trans('invoices.messages.status.send.sent', ['date' => Date::parse($invoice->created_at)->format($date_format)]) }}
                                 @stack('timeline_body_send_invoice_body_message_end')
                             @endif
                         </div>
@@ -302,9 +301,6 @@
                                     @if ($item->sku)
                                         <br><small>{{ trans('items.sku') }}: {{ $item->sku }}</small>
                                     @endif
-                                    @if ($item->item && $item->item->description)
-                                        <br><small>{{ trans('general.description') }}: {{ $item->item->description }}</small>
-                                    @endif
                                 </td>
                                 @stack('name_td_end')
 
@@ -338,7 +334,7 @@
                     <p class="lead">{{ trans_choice('general.notes', 2) }}</p>
 
                     <p class="text-muted well well-sm no-shadow" style="margin-top: 10px;">
-                        {!! nl2br(e($invoice->notes)) !!}   
+                        {{ $invoice->notes }}
                     </p>
                 @endif
                 @stack('notes_input_end')
@@ -456,9 +452,9 @@
                     </div>
                     @stack('button_group_end')
 
-                    @if($invoice->attachments)
-                        @php $files = $invoice->attachments; @endphp
-                        @include('partials.media.files')
+                    @if($invoice->attachment)
+                    @php $file = $invoice->attachment; @endphp
+                    @include('partials.media.file')
                     @endif
                 </div>
             </div>
@@ -588,21 +584,11 @@
 @push('scripts')
     <script type="text/javascript">
         @permission('delete-common-uploads')
-        	@if($invoice->attachments)
-        		@foreach($invoice->attachments as $attach)
-        			$(document).on('click', '#remove-attachment-{!! $attach->id !!}', function (e) {
-        				confirmDelete("#attachment-{!! $attach->id !!}", 
-                            	"{!! trans('general.attachment') !!}", 
-                            	"{!! trans('general.delete_confirm', ['name' => '<strong>' . $attach->basename . '</strong>', 'type' => strtolower(trans('general.attachment'))]) !!}", 
-                            	"{!! trans('general.cancel') !!}", 
-                            	"{!! trans('general.delete')  !!}");
-        			});
-        		@endforeach
-            @elseif($invoice->attachment)
-                $(document).on('click', '#remove-attachment', function (e) {            
-                	confirmDelete("#attachment-{!! $invoice->attachment->id !!}", "{!! trans('general.attachment') !!}", "{!! trans('general.delete_confirm', ['name' => '<strong>' . $invoice->attachment->basename . '</strong>', 'type' => strtolower(trans('general.attachment'))]) !!}", "{!! trans('general.cancel') !!}", "{!! trans('general.delete')  !!}");
-                });
-            @endif
+        @if($invoice->attachment)
+        $(document).on('click', '#remove-attachment', function (e) {
+            confirmDelete("#attachment-{!! $invoice->attachment->id !!}", "{!! trans('general.attachment') !!}", "{!! trans('general.delete_confirm', ['name' => '<strong>' . $invoice->attachment->basename . '</strong>', 'type' => strtolower(trans('general.attachment'))]) !!}", "{!! trans('general.cancel') !!}", "{!! trans('general.delete')  !!}");
+        });
+        @endif
         @endpermission
 
         $(document).on('click', '#button-payment', function (e) {

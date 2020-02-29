@@ -24,7 +24,7 @@ class Invoice extends Model
      *
      * @var array
      */
-    protected $appends = ['attachments', 'attachment', 'amount_without_tax', 'discount', 'paid'];
+    protected $appends = ['attachment', 'amount_without_tax', 'discount', 'paid'];
 
     protected $dates = ['deleted_at', 'invoiced_at', 'due_at'];
 
@@ -167,22 +167,6 @@ class Invoice extends Model
     public function setCurrencyRateAttribute($value)
     {
         $this->attributes['currency_rate'] = (double) $value;
-    }
-
-    /**
-     * Get the current balance.
-     *
-     * @return string
-     */
-    public function getAttachmentsAttribute($value)
-    {
-        if (!empty($value) && !$this->hasMedia('attachment')) {
-            return $value;
-        } elseif (!$this->hasMedia('attachment')) {
-            return false;
-        }
-
-        return $this->getMedia('attachment');
     }
 
     /**

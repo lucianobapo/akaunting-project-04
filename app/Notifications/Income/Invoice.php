@@ -4,15 +4,9 @@ namespace App\Notifications\Income;
 
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
-use App\Traits\DateTime;
-use Date;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Bus\Queueable;
 
 class Invoice extends Notification
 {
-    use DateTime;
-
     /**
      * The bill model.
      *
@@ -53,19 +47,10 @@ class Invoice extends Notification
     public function toMail($notifiable)
     {
         $message = (new MailMessage)
-            ->line(trans('invoices.notification.message', [
-                'amount' => money($this->invoice->amount, $this->invoice->currency_code, true), 
-                'due_at' => Date::parse($this->invoice->due_at)
-                ->format(auth()->user() ? $this->getCompanyDateFormat() : 'd F Y'),
-                'customer' => $this->invoice->customer_name
-            ]));
+            ->line(trans('invoices.notification.message', ['amount' => money($this->invoice->amount, $this->invoice->currency_code, true), 'customer' => $this->invoice->customer_name]));
 
         // Override per company as Laravel doesn't read config
         $message->from(config('mail.from.address'), config('mail.from.name'));
-
-        $message->subject(trans('invoices.notification.subject', [
-                'invoice_number' => $this->invoice->invoice_number
-            ]));
 
         // Attach the PDF file if available
         if (isset($this->invoice->pdf_path)) {

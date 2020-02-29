@@ -6,6 +6,7 @@ use App\Models\Model;
 
 class Currency extends Model
 {
+
     protected $table = 'currencies';
 
     /**

@@ -35,9 +35,6 @@
                 <thead>
                     <tr>
                         <th class="col-md-1 hidden-xs">{{ trans_choice('general.pictures', 1) }}</th>
-                        
-                        <th class="col-md-1">@sortablelink('sku', trans('items.sku'))</th>
-
                         <th class="col-md-3">@sortablelink('name', trans('general.name'))</th>
                         <th class="col-md-1 hidden-xs">@sortablelink('category', trans_choice('general.categories', 1))</th>
                         <th class="col-md-1 hidden-xs">@sortablelink('quantity', trans_choice('items.quantities', 1))</th>
@@ -51,10 +48,7 @@
                 @foreach($items as $item)
                     <tr>
                         <td class="hidden-xs"><img src="{{ $item->picture ? Storage::url($item->picture->id) : asset('public/img/akaunting-logo-green.png') }}" class="img-thumbnail" width="50" alt="{{ $item->name }}"></td>
-                        
-                        <td><a href="{{ route('items.edit', $item->id) }}">{{ $item->sku }}</a></td>
                         <td><a href="{{ route('items.edit', $item->id) }}">{{ $item->name }}</a></td>
-
                         <td class="hidden-xs">{{ $item->category ? $item->category->name : trans('general.na') }}</td>
                         <td class="hidden-xs">{{ $item->quantity }}</td>
                         <td class="text-right amount-space">{{ money($item->sale_price, setting('general.default_currency'), true) }}</td>

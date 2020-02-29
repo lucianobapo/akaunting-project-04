@@ -6,7 +6,6 @@ use App\Models\Setting\Currency;
 
 class Overrider
 {
-    
     public static $company_id;
 
     public static function load($type)
@@ -66,10 +65,7 @@ class Overrider
 
     protected static function loadCurrencies()
     {
-        $currencies = cache()->remember('currencies', 60 * 24, function (){
-            $return = Currency::all();
-            return is_null($return)?[]:$return;
-        });
+        $currencies = Currency::all();
 
         foreach ($currencies as $currency) {
             if (!isset($currency->precision)) {

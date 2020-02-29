@@ -4,7 +4,6 @@ namespace App\Notifications\Auth;
 
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class Reset extends Notification
 {

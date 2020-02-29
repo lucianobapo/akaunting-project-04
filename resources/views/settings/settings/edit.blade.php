@@ -56,13 +56,6 @@
                     </div>
 
                     <div class="tab-pane tab-margin" id="invoice">
-                        {{ Form::textGroup('bill_number_prefix', trans('settings.bill.prefix'), 'font', []) }}
-
-                        {{ Form::textGroup('bill_number_digit', trans('settings.bill.digit'), 'text-width', []) }}
-
-                        {{ Form::textGroup('bill_number_next', trans('settings.bill.next'), 'chevron-right', []) }}
-
-
                         {{ Form::textGroup('invoice_number_prefix', trans('settings.invoice.prefix'), 'font', []) }}
 
                         {{ Form::textGroup('invoice_number_digit', trans('settings.invoice.digit'), 'text-width', []) }}
@@ -143,11 +136,6 @@
                         {{ Form::textGroup('file_size', trans('settings.system.file_size'), 'upload', []) }}
 
                         {{ Form::textGroup('file_types', trans('settings.system.file_types'), 'file-o', []) }}
-                        <div class="setting-buttons">
-                            <div class="form-group no-margin">
-                                <a href="{{ route('settings.cache') }}" class="btn btn-danger"><span class="fa fa-times-circle"></span> &nbsp;{{ trans('settings.system.flush_cache') }}</a>
-                            </div>
-                        </div>
                     </div>
 
                     @permission('update-settings-settings')

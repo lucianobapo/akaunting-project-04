@@ -22,6 +22,9 @@ class Kernel extends ConsoleKernel
         Commands\ModuleEnable::class,
         Commands\ModuleInstall::class,
         Commands\RecurringCheck::class,
+        Commands\FinishUpdate::class,
+        Commands\Update::class,
+        Commands\UpdateTerminal::class,
     ];
 
     /**

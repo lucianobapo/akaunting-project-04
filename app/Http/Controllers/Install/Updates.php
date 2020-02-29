@@ -3,14 +3,16 @@
 namespace App\Http\Controllers\Install;
 
 use App\Http\Controllers\Controller;
+use App\Utilities\Console;
 use App\Utilities\Updater;
 use App\Utilities\Versions;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\File;
 use Module;
 
 class Updates extends Controller
 {
-
     /**
      * Show the form for creating a new resource.
      *
@@ -21,11 +23,17 @@ class Updates extends Controller
         $updates = Updater::all();
 
         $core = null;
+        $expires = null;
 
-        $modules = array();
+        $modules = [];
 
         if (isset($updates['core'])) {
             $core = $updates['core'];
+
+            if (!empty($core->errors) && !empty($core->errors->expires)) {
+                $expires = $core->errors->expires;
+                unset($core->errors->expires);
+            }
         }
 
         $rows = Module::all();
@@ -38,18 +46,37 @@ class Updates extends Controller
                     continue;
                 }
 
+                $update = $updates[$alias];
+
                 $m = new \stdClass();
                 $m->name = $row->get('name');
                 $m->alias = $row->get('alias');
                 $m->category = $row->get('category');
                 $m->installed = $row->get('version');
-                $m->latest = $updates[$alias];
+                $m->latest = $update->data->latest;
+                $m->errors = !empty($update->errors) ? $update->errors->$alias : $update->errors;
 
                 $modules[] = $m;
             }
         }
 
-        return view('install.updates.index', compact('core', 'modules'));
+        $requirements = [];
+
+        $hosting = ' Ask your hosting provider for further help.';
+
+        if (!extension_loaded('bcmath')) {
+            $requirements[] = trans('install.requirements.extension', ['extension' => 'BCMath']) . $hosting;
+        }
+
+        if (!extension_loaded('ctype')) {
+            $requirements[] = trans('install.requirements.extension', ['extension' => 'Ctype']) . $hosting;
+        }
+
+        if (!extension_loaded('json')) {
+            $requirements[] = trans('install.requirements.extension', ['extension' => 'JSON']) . $hosting;
+        }
+
+        return view('install.updates.index', compact('core', 'modules', 'expires', 'requirements'));
     }
 
     public function changelog()
@@ -71,139 +98,6 @@ class Updates extends Controller
     }
 
     /**
-     * Update the core or modules.
-     *
-     * @param  $alias
-     * @param  $version
-     * @return Response
-     */
-    public function update($alias, $version)
-    {
-        if ($alias == 'core') {
-            $name = 'Akaunting ' . $version;
-
-            $installed = version('short');
-        } else {
-            // Get module instance
-            $module = Module::findByAlias($alias);
-
-            $name = $module->get('name');
-
-            $installed = $module->get('version');
-        }
-
-        return view('install.updates.edit', compact('alias', 'name', 'installed', 'version'));
-    }
-
-    /**
-     * Show the form for viewing the specified resource.
-     *
-     * @param  $request
-     *
-     * @return Response
-     */
-    public function steps(Request $request)
-    {
-        $json = [];
-        $json['step'] = [];
-
-        $name = $request['name'];
-        $version = $request['version'];
-
-        // Download
-        $json['step'][] = [
-            'text' => trans('modules.installation.download', ['module' => $name]),
-            'url'  => url('install/updates/download')
-        ];
-
-        // Unzip
-        $json['step'][] = [
-            'text' => trans('modules.installation.unzip', ['module' => $name]),
-            'url'  => url('install/updates/unzip')
-        ];
-
-        // File Copy
-        $json['step'][] = [
-            'text' => trans('modules.installation.file_copy', ['module' => $name]),
-            'url'  => url('install/updates/file-copy')
-        ];
-
-        // Migrate DB and trigger event UpdateFinish event
-        $json['step'][] = [
-            'text' => trans('modules.installation.migrate', ['module' => $name]),
-            'url'  => url('install/updates/migrate')
-        ];
-
-        // redirect update page
-        $json['step'][] = [
-            'text' => trans('modules.installation.finish'),
-            'url'  => url('install/updates/finish')
-        ];
-
-        return response()->json($json);
-    }
-
-    /**
-     * Show the form for viewing the specified resource.
-     *
-     * @param  $request
-     *
-     * @return Response
-     */
-    public function download(Request $request)
-    {
-        set_time_limit(600); // 10 minutes
-
-        if ($request['alias'] != 'core') {
-            $this->checkApiToken();
-        }
-
-        $json = Updater::download($request['name'], $request['alias'], $request['version']);
-
-        return response()->json($json);
-    }
-
-    /**
-     * Show the form for viewing the specified resource.
-     *
-     * @param  $request
-     *
-     * @return Response
-     */
-    public function unzip(Request $request)
-    {
-        set_time_limit(600); // 10 minutes
-
-        if ($request['alias'] != 'core') {
-            $this->checkApiToken();
-        }
-
-        $json = Updater::unzip($request['name'], $request['path']);
-
-        return response()->json($json);
-    }
-
-    /**
-     * Show the form for viewing the specified resource.
-     *
-     * @param  $request
-     *
-     * @return Response
-     */
-    public function fileCopy(Request $request)
-    {
-        set_time_limit(600); // 10 minutes
-
-        if ($request['alias'] != 'core') {
-            $this->checkApiToken();
-        }
-
-        $json = Updater::fileCopy($request['name'], $request['alias'], $request['path'], $request['version']);
-
-        return response()->json($json);
-    }
-
-    /**
      * Show the form for viewing the specified resource.
      *
      * @param  $request
@@ -212,9 +106,13 @@ class Updates extends Controller
      */
     public function migrate(Request $request)
     {
-        $json = Updater::migrate($request['name'], $request['alias'], $request['version'], $request['installed']);
+        Artisan::call('cache:clear');
 
-        return response()->json($json);
+        return response()->json([
+            'success' => true,
+            'errors' => false,
+            'data' => [],
+        ]);
     }
 
     /**
@@ -232,5 +130,78 @@ class Updates extends Controller
             'redirect' => url("install/updates"),
             'data' => [],
         ]);
+    }
+
+    /**
+     * Update the core or modules.
+     *
+     * @param  $alias
+     * @param  $version
+     * @return Response
+     */
+    public function update($alias, $version)
+    {
+        set_time_limit(0); // unlimited
+
+        $core_modules = ['offlinepayment', 'paypalstandard'];
+
+        $modules = Module::all();
+
+        // Delete module files
+        foreach ($modules as $module) {
+            $alias = $module->getAlias();
+
+            if (in_array($alias, $core_modules)) {
+                continue;
+            }
+
+            File::deleteDirectory($module->getPath());
+        }
+
+        // Update core
+        if ($this->applyUpdate('core', '2.0.2') !== true) {
+            $message = 'Not able to update core from UI';
+            \Log::info($message);
+
+            return redirect('install/updates');
+        }
+
+        // Update modules
+        foreach ($modules as $module) {
+            $alias = $module->get('alias');
+
+            if (in_array($alias, $core_modules)) {
+                continue;
+            }
+
+            if ($this->applyUpdate($alias, '2.0.0') !== true) {
+                $message = 'Not able to update ' . $alias . ' from UI';
+                \Log::info($message);
+
+                return redirect('install/updates');
+            }
+        }
+
+        return redirect('/');
+    }
+
+    protected function applyUpdate($alias, $version)
+    {
+        $company_id = session('company_id');
+
+        $command = "php artisan update {$alias} {$company_id} {$version}";
+
+        if (true !== $result = Console::run($command, true)) {
+            $message = !empty($result) ? $result : trans('modules.errors.finish', ['module' => $alias]);
+
+            flash($message)->error();
+            \Log::info($message);
+
+            if ($alias == 'core') {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

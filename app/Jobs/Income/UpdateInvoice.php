@@ -52,7 +52,6 @@ class UpdateInvoice
         $sub_total = 0;
         $discount_total = 0;
         $discount = $this->request['discount'];
-        $discount2 = $this->request['discount2'];
 
         if ($this->request['item']) {
             $items = $this->invoice->items;
@@ -74,7 +73,7 @@ class UpdateInvoice
             $this->deleteRelationships($this->invoice, 'items');
 
             foreach ($this->request['item'] as $item) {
-                $invoice_item = dispatch(new CreateInvoiceItem($item, $this->invoice, $discount, $discount2));
+                $invoice_item = dispatch(new CreateInvoiceItem($item, $this->invoice, $discount));
 
                 // Calculate totals
                 $tax_total += $invoice_item->tax;
@@ -101,11 +100,6 @@ class UpdateInvoice
         // Apply discount to total
         if ($discount) {
             $s_discount = $s_total * ($discount / 100);
-            $discount_total += $s_discount;
-            $s_total = $s_total - $s_discount;
-        }
-        if ($discount2) {
-            $s_discount = $discount2;
             $discount_total += $s_discount;
             $s_total = $s_total - $s_discount;
         }

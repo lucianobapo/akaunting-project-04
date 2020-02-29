@@ -9,12 +9,11 @@ use App\Models\Expense\BillTotal;
 use App\Traits\Currencies;
 use App\Traits\DateTime;
 use App\Traits\Uploads;
-use App\Traits\Expenses;
 use Illuminate\Foundation\Bus\Dispatchable;
 
 class CreateBill
 {
-    use Currencies, DateTime, Dispatchable, Uploads, Expenses;
+    use Currencies, DateTime, Dispatchable, Uploads;
 
     protected $request;
 
@@ -101,9 +100,6 @@ class CreateBill
             'notify' => 0,
             'description' => trans('messages.success.added', ['type' => $bill->bill_number]),
         ]);
-
-        // Update next bill number
-        $this->increaseNextBillNumber();
 
         // Recurring
         $bill->createRecurring();

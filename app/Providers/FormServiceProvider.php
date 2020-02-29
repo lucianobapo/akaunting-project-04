@@ -33,7 +33,6 @@ class FormServiceProvider extends ServiceProvider
 
         Form::component('selectGroup', 'partials.form.select_group', [
             'name', 'text', 'icon', 'values', 'selected' => null, 'attributes' => ['required' => 'required'], 'col' => 'col-md-6',
-            'button_id' => null, 'button_icon' => 'plus',
         ]);
 
         Form::component('textareaGroup', 'partials.form.textarea_group', [
@@ -42,7 +41,6 @@ class FormServiceProvider extends ServiceProvider
 
         Form::component('radioGroup', 'partials.form.radio_group', [
             'name', 'text', 'enable' => trans('general.yes'), 'disable' => trans('general.no'), 'attributes' => [], 'col' => 'col-md-6',
-            
         ]);
 
         Form::component('checkboxGroup', 'partials.form.checkbox_group', [

@@ -4,11 +4,9 @@ namespace App\Models\Module;
 
 use App\Models\Model;
 use Sofa\Eloquence\Eloquence;
-use GeneaLabs\LaravelModelCaching\Traits\Cachable;
 
 class Module extends Model
 {
-    //use Cachable;
     use Eloquence;
 
     protected $table = 'modules';

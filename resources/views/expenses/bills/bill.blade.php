@@ -143,7 +143,7 @@
         @if ($bill->notes)
         <table class="text" style="page-break-inside: avoid;">
             <tr><th>{{ trans_choice('general.notes', 2) }}</th></tr>
-            <tr><td>{!! nl2br(e($bill->notes)) !!}</td></tr>
+            <tr><td>{{ $bill->notes }}</td></tr>
         </table>
         @endif
         @stack('notes_input_end')

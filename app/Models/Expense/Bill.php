@@ -7,7 +7,6 @@ use App\Models\Setting\Currency;
 use App\Traits\Currencies;
 use App\Traits\DateTime;
 use App\Traits\Media;
-use App\Traits\Expenses;
 use App\Traits\Recurring;
 use Bkwld\Cloner\Cloneable;
 use Sofa\Eloquence\Eloquence;
@@ -15,7 +14,7 @@ use Date;
 
 class Bill extends Model
 {
-    use Cloneable, Currencies, DateTime, Eloquence, Media, Recurring, Expenses;
+    use Cloneable, Currencies, DateTime, Eloquence, Media, Recurring;
 
     protected $table = 'bills';
 
@@ -24,7 +23,7 @@ class Bill extends Model
      *
      * @var array
      */
-    protected $appends = ['attachments', 'attachment', 'amount_without_tax', 'discount', 'paid'];
+    protected $appends = ['attachment', 'amount_without_tax', 'discount', 'paid'];
 
     protected $dates = ['deleted_at', 'billed_at', 'due_at'];
 
@@ -142,7 +141,6 @@ class Bill extends Model
     public function onCloning($src, $child = null)
     {
         $this->bill_status_code = 'draft';
-        $this->bill_number = $this->getNextBillNumber();        
     }
 
     /**
@@ -181,22 +179,6 @@ class Bill extends Model
         }
 
         return $this->getMedia('attachment')->last();
-    }
-
-    /**
-     * Get the current balance.
-     *
-     * @return string
-     */
-    public function getAttachmentsAttribute($value)
-    {
-        if (!empty($value) && !$this->hasMedia('attachment')) {
-            return $value;
-        } elseif (!$this->hasMedia('attachment')) {
-            return false;
-        }
-
-        return $this->getMedia('attachment');
     }
 
     /**

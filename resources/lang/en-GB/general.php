@@ -144,4 +144,7 @@ return [
         'this_month' => 'This Month',
         'last_month' => 'Last Month',
     ],
+
+    'avaible' => 'Avaible',
+    'not_compatible' => 'Not compatible with 2.0',
 ];

@@ -230,7 +230,7 @@
 
                                 @stack('due_at_input_start')
                                 <tr>
-                                    <th>{{ trans('bills.due_date') }}:</th>
+                                    <th>{{ trans('bills.payment_due') }}:</th>
                                     <td class="text-right">{{ Date::parse($bill->due_at)->format($date_format) }}</td>
                                 </tr>
                                 @stack('due_at_input_end')
@@ -313,7 +313,7 @@
                     <p class="lead">{{ trans_choice('general.notes', 2) }}:</p>
 
                     <p class="text-muted well well-sm no-shadow" style="margin-top: 10px;">
-                        {!! nl2br(e($bill->notes)) !!}                        
+                        {{ $bill->notes }}
                     </p>
                 @endif
                 @stack('notes_input_end')
@@ -407,9 +407,9 @@
                     </div>
                     @stack('button_group_end')
 
-                    @if($bill->attachments)
-                        @php $files = $bill->attachments; @endphp
-                        @include('partials.media.files')
+                    @if($bill->attachment)
+                    @php $file = $bill->attachment; @endphp
+                    @include('partials.media.file')
                     @endif
                 </div>
             </div>

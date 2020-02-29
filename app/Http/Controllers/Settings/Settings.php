@@ -14,23 +14,11 @@ use App\Traits\DateTime;
 use App\Traits\Uploads;
 use App\Utilities\Installer;
 use App\Utilities\Modules;
-use App\Utilities\CacheUtility;
 use Date;
 
 class Settings extends Controller
 {
     use DateTime, Uploads;
-
-    public function cache(CacheUtility $cache){
-
-        $cache->flush();
-
-        $message = trans_choice('messages.success.updated', 2, ['type' => trans_choice('general.settings', 2)]);
-
-        flash($message)->success();
-
-        return redirect('settings/settings');
-    }
 
     /**
      * Show the form for editing the specified resource.

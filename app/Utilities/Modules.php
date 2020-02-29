@@ -41,7 +41,6 @@ class Modules
         $results = event(new PaymentGatewayListing($gateways));
 
         foreach ($results as $gateways) {
-            if(is_array($gateways))
             foreach ($gateways as $gateway) {
                 if (!isset($gateway['name']) || !isset($gateway['code'])) {
                     continue;

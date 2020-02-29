@@ -30,9 +30,9 @@ return [
     ],
     'invoice' => [
         'tab'               => 'Faturas',
-        'prefix'            => 'Formato do número de Vendas',
-        'digit'             => 'Número de dígitos de Vendas',
-        'next'              => 'Próximo número de Vendas',
+        'prefix'            => 'Formato do número',
+        'digit'             => 'Número de dígitos',
+        'next'              => 'Próximo número',
         'logo'              => 'Logotipo',
         'custom'            => 'Personalizado',
         'item_name'         => 'Nome do Item',
@@ -44,11 +44,6 @@ return [
         'rate'              => 'Taxa',
         'quantity_name'     => 'Nome da quantidade',
         'quantity'          => 'Quantidade',
-    ],
-    'bill' => [
-        'prefix'            => 'Formato do número de Compras',
-        'digit'             => 'Número de dígitos de Compras',
-        'next'              => 'Próximo número de Compras',
     ],
     'default' => [
         'tab'               => 'Padrões',
@@ -76,13 +71,13 @@ return [
     ],
     'scheduling' => [
         'tab'               => 'Agendamento',
-        'send_invoice'      => 'Enviar lembrete de Vendas',
-        'invoice_days'      => 'Dias após o vencimento das Vendas',
-        'send_bill'         => 'Enviar lembrete de Compras',
-        'bill_days'         => 'Dias antes do vencimento das Compras',
+        'send_invoice'      => 'Enviar lembrete de faturas',
+        'invoice_days'      => 'Enviar após dias de vencimento',
+        'send_bill'         => 'Enviar lembrança',
+        'bill_days'         => 'Enviar antes de vencer',
         'cron_command'      => 'Comando Cron',
         'schedule_time'     => 'Iniciar Cron',
-        'send_item_reminder'=> 'Enviar lembrete de Itens',
+        'send_item_reminder'=> 'Enviar Lembrete',
         'item_stocks'       => 'Enviar quando item possui estoque',
     ],
     'appearance' => [
@@ -103,7 +98,6 @@ return [
         ],
         'file_size'         => 'Tamanho máximo do arquivo (MB)',
         'file_types'        => 'Tipos de arquivos permitidos',
-        'flush_cache'        => 'Reiniciar o cache do sistma',
     ],
 
 ];

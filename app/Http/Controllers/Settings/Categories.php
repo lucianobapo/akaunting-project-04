@@ -20,7 +20,12 @@ class Categories extends Controller
 
         $transfer_id = Category::transfer();
 
-        $types = Category::getTypesCollect();
+        $types = collect([
+            'expense' => trans_choice('general.expenses', 1),
+            'income' => trans_choice('general.incomes', 1),
+            'item' => trans_choice('general.items', 1),
+            'other' => trans_choice('general.others', 1),
+        ]);
 
         return view('settings.categories.index', compact('categories', 'types', 'transfer_id'));
     }
@@ -42,7 +47,12 @@ class Categories extends Controller
      */
     public function create()
     {
-        $types = Category::getTypesCollect();
+        $types = [
+            'expense' => trans_choice('general.expenses', 1),
+            'income' => trans_choice('general.incomes', 1),
+            'item' => trans_choice('general.items', 1),
+            'other' => trans_choice('general.others', 1),
+        ];
 
         return view('settings.categories.create', compact('types'));
     }
@@ -74,7 +84,12 @@ class Categories extends Controller
      */
     public function edit(Category $category)
     {
-        $types = Category::getTypesCollect();
+        $types = [
+            'expense' => trans_choice('general.expenses', 1),
+            'income' => trans_choice('general.incomes', 1),
+            'item' => trans_choice('general.items', 1),
+            'other' => trans_choice('general.others', 1),
+        ];
 
         $type_disabled = (Category::where('type', $category->type)->count() == 1) ?: false;
 

@@ -4,11 +4,11 @@ return [
 
     'items'                 => 'Item | Itens',
     'incomes'               => 'Renda|Rendas',
-    'invoices'              => 'Fatura de venda|Faturas de venda',
+    'invoices'              => 'Fatura|Faturas',
     'revenues'              => 'Receita|Receitas',
     'customers'             => 'Cliente|Clientes',
     'expenses'              => 'Despesa|Despesas',
-    'bills'                 => 'Fatura de compra|Faturas de compra',
+    'bills'                 => 'Fatura|Faturas',
     'payments'              => 'Pagamento|Pagamento',
     'vendors'               => 'Fornecedor|Fornecedores',
     'accounts'              => 'Conta|Contas',
@@ -27,7 +27,7 @@ return [
     'profits'               => 'Lucro|Lucros',
     'taxes'                 => 'Imposto|Impostos',
     'logos'                 => 'Logotipo | Logotipos',
-    'pictures'              => 'Imagem|Imagens',
+    'pictures'              => 'Imagen|Imagens',
     'types'                 => 'Tipo|Tipos',
     'payment_methods'       => 'Método de pagamento|Método de pagamentos',
     'compares'              => 'Receita vs Despesa|Receitas vs Despesas',
@@ -67,7 +67,7 @@ return [
     'delete_confirm'        => 'Confirma a exclusão :name :type?',
     'name'                  => 'Nome',
     'email'                 => 'E-mail',
-    'tax_number'            => 'CPF / CNPJ',
+    'tax_number'            => 'Número de identificação fisca',
     'phone'                 => 'Telefone',
     'address'               => 'Endereço',
     'website'               => 'Site',
@@ -144,6 +144,4 @@ return [
         'this_month' => 'Este mês',
         'last_month' => 'Mês Passado',
     ],
-    
-    'quantity'              => 'Quantidade',
 ];

@@ -4,6 +4,6 @@ return [
 
     'previous'              => '&laquo; Anterior',
     'next'                  => 'Próximo &raquo;',
-    'showing'               => 'Mostrando :first até :last de :total - :type',
+    'showing'               => 'Mostrando :first de :last do :total :type',
 
 ];
