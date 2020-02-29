@@ -1,0 +1,22 @@
+{
+    "name": "Inventory",
+    "alias": "inventory",
+    "description": "",
+    "version": "1.0.6",
+    "category": "inventory",
+    "keywords": [],
+    "active": 1,
+    "order": 0,
+    "providers": [
+        "Modules\\Inventory\\Providers\\InventoryServiceProvider",
+        "Modules\\Inventory\\Providers\\ViewComposerServiceProvider",
+        "Modules\\Inventory\\Providers\\ObserverServiceProvider",
+        "Modules\\Inventory\\Providers\\EventServiceProvider"
+    ],
+    "aliases": {},
+    "files": [
+        "start.php"
+    ],
+    "requires": [],
+    "settings": []
+}
